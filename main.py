@@ -29,9 +29,7 @@ def plot_boxplot(dtf, ft):
     plt.grid(False)
     plt.show()
 
-
 plot_boxplot(dfDataSet, "capital-loss")
-
 plot_boxplot(df_2, "capital-loss")
 
 def outliers(dtf, ft):
@@ -41,7 +39,6 @@ def outliers(dtf, ft):
     IQR = Q3 - Q1
     lower_bound = Q1 - 1.5 * IQR
     upper_bound = Q3 + 1.5 * IQR
-
     ls = dtf[ft].index[(dtf[ft] < lower_bound) | (dtf[ft] > upper_bound)]
     return ls
 
@@ -53,13 +50,11 @@ for feature in ['age', 'work-fnl', 'education-num', 'capital-gain', 'capital-los
 for feature in ['age', 'work-fnl', 'education-num', 'capital-gain', 'capital-loss', 'hours-per-week']:
     index_list2.extend(outliers(df_2, feature))
 
-
 def remove(dtf, ls):
     ls = sorted(set(ls))
     dtf = dtf.drop(ls)
     return dtf
 dfDataSet = remove(dfDataSet, index_list)
-
 
 dfDataSet['work-class'] = dfDataSet['work-class'].str.replace('?', dfDataSet['work-class'].mode()[0])
 
@@ -87,18 +82,11 @@ df_2['sex'] = df_2['sex'].str.replace('?', dfDataSet['sex'].mode()[0])
 
 
 le = LabelEncoder()
-
 le.fit(dfDataSet['salary'])
-
 le.transform(dfDataSet['salary'])
-
 le_2 = dfDataSet['salary']
-
-
 dfDataSet['salary'] = le.transform(dfDataSet['salary'])
-
 print(dfDataSet[['salary']])
-
 
 def encode(df, col):
     le.fit(df[col])
@@ -113,14 +101,15 @@ for col in ['work-class', 'education', 'marital-status',  'relationship', 'race'
 for col in ['work-class', 'education', 'marital-status', 'relationship', 'race', 'sex','native-country']:
     encode_test(df_2, col)
 
-
-matrix = dfDataSet.corr()
-print("Correlation:")
-plt.subplots(figsize=(12, 8))
-top_corr = dfDataSet.corr()
-sns.heatmap(top_corr, annot=True)
+# obtain the correlations of each features in dataset
+corrmat = dfDataSet.corr()
+top_corr_features = corrmat.index
+plt.figure(figsize=(12, 12))
+# plot heat map
+g = sns.heatmap(dfDataSet[top_corr_features].corr(), annot=True, cmap="RdYlGn")
 plt.show()
 print(dfDataSet)
+
 
 from sklearn.model_selection import train_test_split
 columns = dfDataSet.iloc[:, 0:13]
@@ -138,7 +127,14 @@ classifier = LogisticRegression(solver='lbfgs', multi_class="auto", random_state
 classifier.fit(X_train, y_train)
 y_pred = classifier.predict(X_test)
 
-
+#standardization(feature scaling)
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+print('X train')
+print(X_train.shape[1])
+X_test = scaler.transform(X_test)
+print('X test')
+print(X_test.shape[1])
 
 df_2=scaler.transform(df_2)
 test_predictions=classifier.predict(df_2)
